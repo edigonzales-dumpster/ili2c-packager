@@ -5,7 +5,7 @@ on:
      - 'main'
 
 env:
-  VERSION: 4.5.0
+  VERSION: 5.2.2
 
 jobs:  
   build:
@@ -16,20 +16,20 @@ jobs:
           - os: 'ubuntu-20.04'
             label: 'linux'
             package: 'deb'
-            icon: 'icon-ili2db-128x128.png'
-            asset_prefix: 'ili2gpkg_'
+            icon: 'icon-compiler-128x128.png'
+            asset_prefix: 'ili2c_'
             asset_suffix: '-1_amd64'
           - os: 'macos-10.15'
             label: 'mac'
             package: 'pkg'
-            icon: 'icon-ili2db-128x128.icns'
-            asset_prefix: 'ili2gpkg-'
+            icon: 'icon-compiler-128x128.icns'
+            asset_prefix: 'ili2c-'
             asset_suffix: ''
           - os: 'windows-latest'
             label: 'win'
             package: 'msi'
-            icon: 'icon-ili2db-128x128.ico'
-            asset_prefix: 'ili2gpkg-'
+            icon: 'icon-compiler-128x128.ico'
+            asset_prefix: 'ili2c-'
             asset_suffix: ''
     runs-on: ${{matrix.os}}
 
@@ -42,29 +42,29 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
-      - name: 'Download zipped ili2gpkg release'
+      - name: 'Download zipped ili2c release'
         run: |
-          curl -L https://downloads.interlis.ch/ili2gpkg/ili2gpkg-${{env.VERSION}}.zip -o ili2gpkg.zip
-      - name: 'Unzip ili2gpkg release'
+          curl -L https://downloads.interlis.ch/ili2c/ili2c-${{env.VERSION}}.zip -o ili2c.zip
+      - name: 'Unzip ili2c release'
         run: |
-          unzip ili2gpkg.zip
+          unzip ili2c.zip
       - name: 'Setup Java 16'
         uses: actions/setup-java@v1
         with:
           java-version: 16
       - name: 'Get dependencies (jdeps)'
         run: |
-          echo "DEPS=$(jdeps --class-path 'libs/*' --multi-release base -recursive --ignore-missing-deps --print-module-deps ili2gpkg-${{env.VERSION}}.jar)" >> $GITHUB_ENV
+          echo "DEPS=$(jdeps --class-path 'libs/*' --multi-release base -recursive --ignore-missing-deps --print-module-deps ili2c-${{env.VERSION}}.jar)" >> $GITHUB_ENV
         shell: bash
       - name: 'Create JRE (jlink)'
         run: |
-          jlink --add-modules ${{env.DEPS}} --output ili2gpkg-jre
+          jlink --add-modules ${{env.DEPS}} --output ili2c-jre
       - name: 'Copy main jar to libs'
         run: |
-          cp ili2gpkg-${{env.VERSION}}.jar libs/
+          cp ili2c-${{env.VERSION}}.jar libs/
       - name: 'Create package (jpackage)'
         run: |
-          jpackage --icon ${{matrix.icon}} --name ili2gpkg --type ${{matrix.package}} --input libs --main-jar ili2gpkg-${{env.VERSION}}.jar -d output --runtime-image ili2gpkg-jre --app-version ${{env.VERSION}} --java-options -Xmx2g 
+          jpackage --icon ${{matrix.icon}} --name ili2c --type ${{matrix.package}} --input libs --main-jar ili2c-${{env.VERSION}}.jar -d output --runtime-image ili2c-jre --app-version ${{env.VERSION}} --java-options -Xmx2g 
         shell: bash
       - name: List all files in output directory
         run: ls -la output
