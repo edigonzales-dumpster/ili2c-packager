@@ -54,17 +54,14 @@ jobs:
           java-version: 16
       - name: 'Get dependencies (jdeps)'
         run: |
-          echo "DEPS=$(jdeps --class-path 'libs/*' --multi-release base -recursive --ignore-missing-deps --print-module-deps ili2c-${{env.VERSION}}.jar)" >> $GITHUB_ENV
+          echo "DEPS=$(jdeps --class-path './*' --multi-release base -recursive --ignore-missing-deps --print-module-deps ili2c.jar)" >> $GITHUB_ENV
         shell: bash
       - name: 'Create JRE (jlink)'
         run: |
           jlink --add-modules ${{env.DEPS}} --output ili2c-jre
-      - name: 'Copy main jar to libs'
-        run: |
-          cp ili2c-${{env.VERSION}}.jar libs/
       - name: 'Create package (jpackage)'
         run: |
-          jpackage --icon ${{matrix.icon}} --name ili2c --type ${{matrix.package}} --input libs --main-jar ili2c-${{env.VERSION}}.jar -d output --runtime-image ili2c-jre --app-version ${{env.VERSION}} --java-options -Xmx2g 
+          jpackage --icon ${{matrix.icon}} --name ili2c --type ${{matrix.package}} --input . --main-jar ili2c.jar -d output --runtime-image ili2c-jre --app-version ${{env.VERSION}}
         shell: bash
       - name: List all files in output directory
         run: ls -la output
